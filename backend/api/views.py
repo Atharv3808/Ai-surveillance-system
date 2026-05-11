@@ -188,7 +188,16 @@ class UploadedVideoViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Already processed. Delete and re-upload to reprocess.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        UploadedVideo.objects.filter(pk=video.pk).update(status='processing', progress=0.0)
+        # For failed videos, wipe any partial records from the previous attempt so that
+        # the processor can create fresh VideoAnalysisResult / VideoAlert rows.
+        if video.status == 'failed':
+            from .models import VideoAnalysisResult
+            VideoAnalysisResult.objects.filter(uploaded_video=video).delete()
+            video.video_alerts.all().delete()
+
+        UploadedVideo.objects.filter(pk=video.pk).update(
+            status='processing', progress=0.0, error_message=None
+        )
         thread = threading.Thread(target=_run_processor, args=(video.pk,), daemon=True)
         thread.start()
         return Response({'status': 'processing', 'message': 'Video analysis started.'})

@@ -51,6 +51,8 @@ class SurveillanceAI:
 
     # EAR threshold — below this → eyes closed / looking sharply away
     EAR_LOW_THRESHOLD       = 0.20
+    # Consecutive frames below EAR threshold required before alerting (excludes blinks)
+    EAR_BLINK_FRAMES        = 3
 
     # State-machine durations (seconds)
     WARNING_DURATION        = 3.0
@@ -65,10 +67,11 @@ class SurveillanceAI:
 
     # Misc
     MIN_FACE_AREA_RATIO      = 0.005
-    BODY_MOVEMENT_THRESHOLD  = 0.15
+    BODY_MOVEMENT_THRESHOLD  = 0.20   # raised from 0.15; normal seat-shifts are ~0.10–0.15
     MISSING_FACE_THRESHOLD   = 25
     MULTIPLE_FACE_THRESHOLD  = 10
-    GAZE_SUSPICIOUS_FRAMES   = 8
+    # 15 consecutive left/right gaze frames (~3 s at 5 fps) before alerting
+    GAZE_SUSPICIOUS_FRAMES   = 15
     RECALIBRATE_AFTER_MISS   = 50
 
     # ── 10-point canonical face model (mm, right-handed) ─────────────────────
@@ -129,6 +132,7 @@ class SurveillanceAI:
 
         self.gaze_history        = {}   # rk → deque of off-center frames
         self.body_history        = {}   # rk → deque of shoulder-Y values
+        self.eyes_closed_frames  = {}   # rk → consecutive low-EAR frame count
 
         # ── Alert cooldown table ─────────────────────────────────────────────
         self.alert_cooldowns = {}       # "type:roll" → last emission time
@@ -154,7 +158,7 @@ class SurveillanceAI:
         for k in targets:
             for d in (self.calibration_buffers, self.pose_baselines, self.is_calibrated,
                       self.behavior_state, self.abnormal_since, self.normal_since,
-                      self.yaw_history):
+                      self.yaw_history, self.eyes_closed_frames):
                 d.pop(k, None)
             if k in self.kalman_filters:
                 self.kalman_filters[k].reset()
@@ -527,15 +531,24 @@ class SurveillanceAI:
                                        f'Sustained head direction: {head_dir}',
                                        0.8, session_id, 'suspicious', roll)
 
-                    if gaze_dir != 'Center':
+                    # Gaze: only track lateral (left/right) deviations.
+                    # Downward gaze is normal during writing and must not be flagged.
+                    if gaze_dir in ('Left', 'Right'):
                         self._track_gaze(rk, gaze_dir, alerts, session_id)
-                    elif rk in self.gaze_history:
-                        self.gaze_history[rk].clear()
+                    else:
+                        if rk in self.gaze_history:
+                            self.gaze_history[rk].clear()
 
+                    # Eyes closed: require EAR_BLINK_FRAMES consecutive low-EAR frames
+                    # so that normal blinks (~2–3 frames) are not flagged.
                     if ear < self.EAR_LOW_THRESHOLD:
-                        self.add_alert(alerts, 'eyes_closed',
-                                       'Eyes appear closed or averted',
-                                       0.75, session_id, 'warning', roll)
+                        self.eyes_closed_frames[rk] = self.eyes_closed_frames.get(rk, 0) + 1
+                        if self.eyes_closed_frames[rk] >= self.EAR_BLINK_FRAMES:
+                            self.add_alert(alerts, 'eyes_closed',
+                                           'Eyes appear closed or averted',
+                                           0.75, session_id, 'warning', roll)
+                    else:
+                        self.eyes_closed_frames[rk] = 0
 
                     if idx == 0:
                         self._track_body(pose_res, rk, alerts, session_id)

@@ -87,9 +87,10 @@ def extract_gaze_vector(face_landmarks) -> tuple:
 
 
 def gaze_direction_label(gaze_x: float, gaze_y: float) -> str:
-    if abs(gaze_y) > 0.4:
+    # 0.5 threshold (~25 % of eye width from centre) reduces landmark-noise false positives
+    if abs(gaze_y) > 0.5:
         return 'Down' if gaze_y > 0 else 'Up'
-    if abs(gaze_x) > 0.4:
+    if abs(gaze_x) > 0.5:
         return 'Right' if gaze_x > 0 else 'Left'
     return 'Center'
 

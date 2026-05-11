@@ -36,9 +36,10 @@ class Alert(models.Model):
         ('looking_left_right',        'Looking Left/Right'),
         ('face_missing',              'Face Missing'),
         ('multiple_faces',            'Multiple Faces'),
-        ('suspicious_body_movement',  'Suspicious Body Movement'),   # Bug 1 fix
-        ('abnormal_body_movement',    'Abnormal Body Movement'),     # kept for migration compat
+        ('suspicious_body_movement',  'Suspicious Body Movement'),
+        ('abnormal_body_movement',    'Abnormal Body Movement'),   # kept for migration compat
         ('unknown_person',            'Unknown Person Detected'),
+        ('eyes_closed',               'Eyes Closed / Drowsy'),
     ]
     
     session = models.ForeignKey(ExamSession, on_delete=models.CASCADE, related_name='alerts')

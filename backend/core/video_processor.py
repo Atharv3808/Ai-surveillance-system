@@ -211,7 +211,7 @@ class VideoProcessor:
                             frame, video_ts, frame_num, ad
                         )
                         if orig_file:
-                            VideoEvidenceFrame.objects.create(
+                            ev_frame = VideoEvidenceFrame.objects.create(
                                 uploaded_video     = video_obj,
                                 alert              = alert_obj,
                                 frame_number       = frame_num,
@@ -219,9 +219,12 @@ class VideoProcessor:
                                 image              = orig_file,
                                 overlay_image      = overlay_file,
                             )
-                            # Link to VideoAlert as well for backward compat/convenience
-                            alert_obj.evidence_image = overlay_file or orig_file
-                            alert_obj.save()
+                            # Link alert to the *already-saved* ImageFieldFile so we don't
+                            # re-read an exhausted ContentFile buffer (double-use bug).
+                            saved_img = ev_frame.overlay_image if ev_frame.overlay_image else ev_frame.image
+                            VideoAlert.objects.filter(pk=alert_obj.pk).update(
+                                evidence_image=saved_img.name
+                            )
 
                     sev_counts[sev] = sev_counts.get(sev, 0) + 1
                     conf_sum += ad['confidence']
