@@ -157,7 +157,7 @@ const AlertsLogs = () => {
                   <div className="relative aspect-[16/9] bg-[#080c14] overflow-hidden">
                     {alert.evidence?.screenshot ? (
                       <img
-                        src={`http://localhost:8000${alert.evidence.screenshot}`}
+                        src={alert.evidence.screenshot}
                         alt="Evidence"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />

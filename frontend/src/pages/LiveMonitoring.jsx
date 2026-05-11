@@ -85,7 +85,7 @@ const LiveMonitoring = () => {
     if (!sessionId) return;
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl    = `${protocol}//${window.location.hostname}:8000/ws/monitoring/${sessionId}/`;
+    const wsUrl    = `${protocol}//${window.location.host}/ws/monitoring/${sessionId}/`;
 
     const mergeAlerts = (prev, incoming) => {
       const now       = Date.now();

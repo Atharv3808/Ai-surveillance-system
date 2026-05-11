@@ -122,7 +122,7 @@ const StudentRecords = () => {
                         <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 border border-white/[0.08] bg-[#0d1525]">
                           {student.face_image ? (
                             <img
-                              src={`http://localhost:8000${student.face_image}`}
+                              src={student.face_image}
                               alt={student.name}
                               className="w-full h-full object-cover"
                             />

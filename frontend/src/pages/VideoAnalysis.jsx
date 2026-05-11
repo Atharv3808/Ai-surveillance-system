@@ -23,7 +23,7 @@ const fmtTs = sec => {
   return `${m}:${String(Math.floor(sec % 60)).padStart(2, '0')}.${(sec % 1).toFixed(1).slice(2)}`;
 };
 
-const MEDIA = 'http://localhost:8000';
+const MEDIA = '';
 
 const SEV_STYLE = {
   critical:   { badge: 'bg-red-500/15 text-red-400 border-red-500/25',   dot: '#ef4444' },
