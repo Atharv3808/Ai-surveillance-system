@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react({ jsxRuntime: 'automatic' })],
 
   server: {
+    allowedHosts: true,
     proxy: {
       // REST API
       '/api': {

@@ -20,7 +20,21 @@
       "Bash(python manage.py migrate)",
       "Bash(python -c ' *)",
       "Bash(python manage.py check)",
-      "Bash(python manage.py shell -c ' *)"
+      "Bash(python manage.py shell -c ' *)",
+      "Bash(grep -E \"\\\\.\\(env|json|txt|yml|yaml|toml|cfg|ini\\)$\")",
+      "Bash(ssh -i \"/Users/atharvshinde/aipowered system/botman.pem\" -o StrictHostKeyChecking=no -o ConnectTimeout=15 ubuntu@65.2.180.0 \"echo 'SSH connection successful' && uname -a && lsb_release -a 2>/dev/null\")",
+      "Bash(rsync -avz --progress --exclude=.venv --exclude=node_modules --exclude=__pycache__ --exclude=.git '--exclude=*.pem' --exclude=db.sqlite3 --exclude=.claude -e 'ssh -i '\\\\''/Users/atharvshinde/aipowered system/botman.pem'\\\\'' -o StrictHostKeyChecking=no' '/Users/atharvshinde/aipowered system/' 'ubuntu@65.2.180.0:~/aipowered-system/')",
+      "Bash(ssh -i '/Users/atharvshinde/aipowered system/botman.pem' -o StrictHostKeyChecking=no ubuntu@65.2.180.0 ' *)",
+      "Bash(rsync -avz -e 'ssh -i '\\\\''/Users/atharvshinde/aipowered system/botman.pem'\\\\'' -o StrictHostKeyChecking=no' '/Users/atharvshinde/aipowered system/backend/surveillance_backend/settings_prod.py' 'ubuntu@65.2.180.0:~/aipowered-system/backend/surveillance_backend/settings_prod.py')",
+      "Bash(brew install *)",
+      "Bash(pkill -f 'cloudflared tunnel')",
+      "Bash(cloudflared tunnel *)",
+      "Bash(jobs -l)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(npm run *)",
+      "Read(//tmp/**)",
+      "Bash(pkill -f \"npm run dev\")",
+      "Read(//private/tmp/**)"
     ]
   }
 }
