@@ -25,6 +25,7 @@ staticfiles/
 venv/
 env/
 .venv/
+backend/venv/
 
 # SSH / credentials
 *.pem
